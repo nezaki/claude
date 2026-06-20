@@ -1,0 +1,19 @@
+name: 親リポジトリへ更新通知
+
+# main への push 時に、このサブモジュールを利用する親リポジトリへ
+# repository_dispatch を送り、サブモジュール更新ワークフローを起動する。
+on:
+  push:
+    branches: [main]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: fastapi-work に repository_dispatch を送信
+        env:
+          # 親リポジトリ nezaki/fastapi-work の Contents: write 権限を持つ PAT
+          GH_TOKEN: ${{ secrets.PARENT_DISPATCH_TOKEN }}
+        run: |
+          gh api repos/nezaki/fastapi-work/dispatches \
+            -f event_type=submodule-update
